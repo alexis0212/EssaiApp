@@ -1,0 +1,243 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: radial-gradient(circle at top, #1f2937, #020617);
+  color: #f9fafb;
+}
+
+.app-root {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(15, 23, 42, 0.92);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow:
+    0 20px 40px rgba(15, 23, 42, 0.7),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+  padding: 1.75rem 1.75rem 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.card-header {
+  margin-bottom: 1.25rem;
+}
+
+.card-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+}
+
+.card-header p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #cbd5f5;
+}
+
+.card-section {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.card-section:first-of-type {
+  border-top: none;
+}
+
+.card-section--toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.task-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.8);
+  color: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.task-input::placeholder {
+  color: #9ca3af;
+}
+
+.task-input:focus {
+  border-color: #6366f1;
+  background: rgba(15, 23, 42, 1);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.6);
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease,
+    box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.55);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.65);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: #e5e7eb;
+}
+
+.btn-ghost:hover {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(248, 113, 113, 0.9);
+  color: #fecaca;
+}
+
+.btn-small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.chip--active {
+  border-color: rgba(129, 140, 248, 1);
+  background: radial-gradient(circle at top left, #4f46e5, #7c3aed);
+  color: white;
+}
+
+.counter {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #d1d5db;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.task-main input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #6366f1;
+}
+
+.task-title {
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.task-title--done {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.empty-state {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 1.25rem 1.25rem 1rem;
+  }
+
+  .card-section--toolbar {
+    align-items: flex-start;
+  }
+}
+
