@@ -10,6 +10,12 @@ export default function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [filter, setFilter] = useState('all');
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingFields, setEditingFields] = useState({
+    description: '',
+    dueDate: '',
+    status: 'in_progress',
+  });
 
   const handleAdd = (event) => {
     event.preventDefault();
@@ -20,7 +26,9 @@ export default function App() {
       {
         id: crypto.randomUUID(),
         title: trimmed,
-        done: false,
+        description: '',
+        dueDate: '',
+        status: 'in_progress',
         createdAt: new Date().toISOString(),
       },
       ...current,
@@ -28,10 +36,21 @@ export default function App() {
     setTitle('');
   };
 
-  const toggleTask = (id) => {
+  const updateTask = (id, partial) => {
+    setTasks((current) =>
+      current.map((task) => (task.id === id ? { ...task, ...partial } : task))
+    );
+  };
+
+  const toggleTaskStatus = (id) => {
     setTasks((current) =>
       current.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
+        task.id === id
+          ? {
+              ...task,
+              status: task.status === 'done' ? 'in_progress' : 'done',
+            }
+          : task
       )
     );
   };
@@ -41,12 +60,48 @@ export default function App() {
   };
 
   const filteredTasks = useMemo(() => {
-    if (filter === 'active') return tasks.filter((task) => !task.done);
-    if (filter === 'done') return tasks.filter((task) => task.done);
+    if (filter === 'active') {
+      return tasks.filter((task) => task.status === 'in_progress');
+    }
+    if (filter === 'done') {
+      return tasks.filter((task) => task.status === 'done');
+    }
     return tasks;
   }, [tasks, filter]);
 
-  const remainingCount = tasks.filter((task) => !task.done).length;
+  const remainingCount = tasks.filter(
+    (task) => task.status === 'in_progress'
+  ).length;
+
+  const startEditing = (task) => {
+    setEditingTaskId(task.id);
+    setEditingFields({
+      description: task.description || '',
+      dueDate: task.dueDate || '',
+      status: task.status || 'in_progress',
+    });
+  };
+
+  const handleEditingFieldChange = (field, value) => {
+    setEditingFields((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const saveEditing = () => {
+    if (!editingTaskId) return;
+    updateTask(editingTaskId, {
+      description: editingFields.description.trim(),
+      dueDate: editingFields.dueDate,
+      status: editingFields.status,
+    });
+    setEditingTaskId(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingTaskId(null);
+  };
 
   return (
     <div className="app-root">
@@ -77,9 +132,7 @@ export default function App() {
               <button
                 key={key}
                 type="button"
-                className={
-                  'chip' + (filter === key ? ' chip--active' : '')
-                }
+                className={'chip' + (filter === key ? ' chip--active' : '')}
                 onClick={() => setFilter(key)}
               >
                 {label}
@@ -92,7 +145,7 @@ export default function App() {
               ? 'Aucune tâche pour le moment.'
               : remainingCount === 0
               ? 'Toutes les tâches sont terminées 🎉'
-              : `${remainingCount} tâche(s) à faire`}
+              : `${remainingCount} tâche(s) en cours`}
           </p>
         </section>
 
@@ -103,31 +156,155 @@ export default function App() {
             </p>
           ) : (
             <ul className="task-list">
-              {filteredTasks.map((task) => (
-                <li key={task.id} className="task-item">
-                  <label className="task-main">
-                    <input
-                      type="checkbox"
-                      checked={task.done}
-                      onChange={() => toggleTask(task.id)}
-                    />
-                    <span
-                      className={
-                        'task-title' + (task.done ? ' task-title--done' : '')
-                      }
-                    >
-                      {task.title}
-                    </span>
-                  </label>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-small"
-                    onClick={() => deleteTask(task.id)}
-                  >
-                    Supprimer
-                  </button>
-                </li>
-              ))}
+              {filteredTasks.map((task) => {
+                const isDone = task.status === 'done';
+                const isEditing = editingTaskId === task.id;
+
+                return (
+                  <li key={task.id} className="task-item">
+                    <div className="task-row">
+                      <label className="task-main">
+                        <input
+                          type="checkbox"
+                          checked={isDone}
+                          onChange={() => toggleTaskStatus(task.id)}
+                        />
+                        <div className="task-text-block">
+                          <span
+                            className={
+                              'task-title' +
+                              (isDone ? ' task-title--done' : '')
+                            }
+                            onClick={() => startEditing(task)}
+                          >
+                            {task.title}
+                          </span>
+                          {task.description ? (
+                            <span className="task-description">
+                              {task.description}
+                            </span>
+                          ) : null}
+                          {task.dueDate ? (
+                            <span className="task-meta">
+                              À faire pour le {task.dueDate}
+                            </span>
+                          ) : null}
+                        </div>
+                      </label>
+                      <div className="task-actions">
+                        <span
+                          className={
+                            'task-status-badge' +
+                            (isDone
+                              ? ' task-status-badge--done'
+                              : ' task-status-badge--in-progress')
+                          }
+                        >
+                          {isDone ? 'Terminée' : 'En cours'}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-small"
+                          onClick={() => deleteTask(task.id)}
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+
+                    {isEditing && (
+                      <div className="task-details">
+                        <div className="task-details-row">
+                          <label className="task-details-label">
+                            Description
+                            <textarea
+                              className="task-details-input"
+                              rows={2}
+                              value={editingFields.description}
+                              onChange={(event) =>
+                                handleEditingFieldChange(
+                                  'description',
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
+                        </div>
+                        <div className="task-details-row">
+                          <label className="task-details-label">
+                            Date
+                            <input
+                              type="date"
+                              className="task-details-input"
+                              value={editingFields.dueDate}
+                              onChange={(event) =>
+                                handleEditingFieldChange(
+                                  'dueDate',
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
+                        </div>
+                        <div className="task-details-row task-details-row--status">
+                          <span className="task-details-label-text">
+                            Statut
+                          </span>
+                          <div className="task-status-toggle">
+                            <button
+                              type="button"
+                              className={
+                                'chip' +
+                                (editingFields.status === 'in_progress'
+                                  ? ' chip--active'
+                                  : '')
+                              }
+                              onClick={() =>
+                                handleEditingFieldChange(
+                                  'status',
+                                  'in_progress'
+                                )
+                              }
+                            >
+                              En cours
+                            </button>
+                            <button
+                              type="button"
+                              className={
+                                'chip' +
+                                (editingFields.status === 'done'
+                                  ? ' chip--active'
+                                  : '')
+                              }
+                              onClick={() =>
+                                handleEditingFieldChange('status', 'done')
+                              }
+                            >
+                              Terminée
+                            </button>
+                          </div>
+                        </div>
+                        <div className="task-details-row task-details-row--actions">
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-small"
+                            onClick={saveEditing}
+                          >
+                            Enregistrer
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-small"
+                            onClick={cancelEditing}
+                          >
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
